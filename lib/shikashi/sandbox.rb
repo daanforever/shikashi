@@ -203,7 +203,13 @@ module Shikashi
         if privileges
           unless privileges.const_write_allowed? "#{klass}::#{const_id}"
             if (klass == Object)
-              unless privileges.const_write_allowed? const_id.to_s
+
+              unless privileges.const_write_allowed? const_id.to_s or
+                  value.instance_of? String or
+                  value.instance_of? Fixnum or
+                  value.instance_of? Numeric or
+                  value.instance_of? Float
+                
                 raise SecurityError.new("Cannot assign const #{const_id}")
               end
             else
