@@ -204,15 +204,13 @@ module Shikashi
           unless privileges.const_write_allowed? "#{klass}::#{const_id}"
             if (klass == Object)
 
-              m = begin
-                klass.constants(method_name)
-                dest_source = m.body.file
-              rescue
-                dest_source = nil
-              end
-
-              unless privileges.const_write_allowed? const_id.to_s or source == dest_source
-                #raise SecurityError.new("Cannot assign const #{const_id}")
+              unless privileges.const_write_allowed? const_id.to_s or
+                  value.instance_of? String or
+                  value.instance_of? Fixnum or
+                  value.instance_of? Numeric or
+                  value.instance_of? Float
+                
+                raise SecurityError.new("Cannot assign const #{const_id}")
               end
             else
               raise SecurityError.new("Cannot assign const #{klass}::#{const_id}")
