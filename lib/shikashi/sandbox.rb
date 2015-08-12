@@ -143,6 +143,11 @@ module Shikashi
     class EvalhookHandler < EvalHook::HookHandler
       attr_accessor :sandbox
 
+      def initialize(*args)
+        super(*args)
+        @hashes = Hash.new
+      end
+
       def handle_xstr( str )
         source = get_caller
 
@@ -229,6 +234,16 @@ module Shikashi
             method_name = :method_missing
             klass.instance_method(:method_missing)
           end
+          if @hashes.has_key?(m.hash)
+            if @hashes[m.hash] == false
+               raise SecurityError.new("Cannot invoke method #{method_name} on object of class #{klass}")
+            else
+               return nil
+            end
+          end
+
+          @hashes[m.hash] = false
+
           dest_source = m.body.file
 
           privileges = nil
@@ -259,6 +274,8 @@ module Shikashi
               end
             end
           end
+
+          @hashes[m.hash] = true
 
           return nil if method_name == :instance_eval
           return nil if method_name == :binding
