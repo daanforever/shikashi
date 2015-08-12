@@ -145,7 +145,7 @@ module Shikashi
 
       def initialize(*args)
         super(*args)
-        @hashes = Hash.new
+        @method_hashes = Hash.new
       end
 
       def handle_xstr( str )
@@ -225,7 +225,18 @@ module Shikashi
 
         method_id = 0
 
+        hashed_entry = "#{klass.object_id},#{method_name}"
+
         if method_name
+          if @method_hashes.has_key?(hashed_entry)
+            if @method_hashes[hashed_entry] == false
+               raise SecurityError.new("Cannot invoke method #{method_name} on object of class #{klass}")
+            else
+               return nil
+            end
+          end
+
+          @method_hashes[hashed_entry] = false
 
           source = self.get_caller
           m = begin
@@ -234,15 +245,8 @@ module Shikashi
             method_name = :method_missing
             klass.instance_method(:method_missing)
           end
-          if @hashes.has_key?(m.hash)
-            if @hashes[m.hash] == false
-               raise SecurityError.new("Cannot invoke method #{method_name} on object of class #{klass}")
-            else
-               return nil
-            end
-          end
 
-          @hashes[m.hash] = false
+
 
           dest_source = m.body.file
 
@@ -275,7 +279,7 @@ module Shikashi
             end
           end
 
-          @hashes[m.hash] = true
+          @method_hashes[hashed_entry] = true
 
           return nil if method_name == :instance_eval
           return nil if method_name == :binding
