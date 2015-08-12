@@ -11,4 +11,6 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
 
+  gem.add_dependency 'evalhook', '~> 0.6.0'
+  gem.add_dependency 'getsource', '~> 0.2.2'
 end
