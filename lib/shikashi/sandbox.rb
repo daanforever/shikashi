@@ -271,7 +271,7 @@ module Shikashi
       end # if
 
       def get_caller
-        caller[2].split(":").first
+        caller_locations[2].to_s.split(":")[0]
       end
     end # Class
 
