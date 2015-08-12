@@ -271,14 +271,7 @@ module Shikashi
       end # if
 
       def get_caller
-        a = caller[2].split(":").first
-        b = caller_locations[2].to_s.split(":")[0]
-        if a != b
-          puts "difference"
-          puts a
-          puts b
-        end
-        a
+        caller_locations[2].to_s.split(":")[0]
       end
     end # Class
 
