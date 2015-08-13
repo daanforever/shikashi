@@ -161,7 +161,11 @@ module Shikashi
 
         privileges = sandbox.privileges[source]
         if privileges
-          unless privileges.global_write_allowed? global_id
+          unless privileges.global_write_allowed? global_id or
+              value.instance_of? String or
+              value.instance_of? Fixnum or
+              value.instance_of? Numeric or
+              value.instance_of? Float
             raise SecurityError.new("Cannot assign global variable #{global_id}")
           end
         end
@@ -209,7 +213,7 @@ module Shikashi
                   value.instance_of? Fixnum or
                   value.instance_of? Numeric or
                   value.instance_of? Float
-                
+
                 raise SecurityError.new("Cannot assign const #{const_id}")
               end
             else
