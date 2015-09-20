@@ -19,6 +19,7 @@ along with shikashi.  if not, see <http://www.gnu.org/licenses/>.
 
 =end
 require "find"
+require "set"
 
 module Shikashi
 #
@@ -97,12 +98,12 @@ public
     @allowed_kinds = Hash.new
     @allowed_classes = Hash.new
     @allowed_instances = Hash.new
-    @allowed_methods = Array.new
+    @allowed_methods = Set.new
     @allowed_klass_methods = Hash.new
-    @allowed_read_globals = Array.new
-    @allowed_read_consts = Array.new
-    @allowed_write_globals = Array.new
-    @allowed_write_consts = Array.new
+    @allowed_read_globals = Set.new
+    @allowed_read_consts = Set.new
+    @allowed_write_globals = Set.new
+    @allowed_write_consts = Set.new
   end
 
 private
@@ -415,4 +416,3 @@ public
 end
 
 end
-

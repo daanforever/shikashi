@@ -18,7 +18,7 @@ x.report {
 		nil.foo
 		}
 		"
-		
+
 	s.run code, Shikashi::Privileges.allow_method(:times).allow_method(:foo)
 }
 
