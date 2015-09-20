@@ -20,4 +20,5 @@ Gem::Specification.new do |gem|
 
   gem.add_dependency 'evalhook', '~> 0.6.0'
   gem.add_dependency 'getsource', '~> 0.2.2'
+  gem.add_development_dependency 'ruby-prof'
 end

@@ -186,10 +186,11 @@ module Shikashi
       end
 
       def handle_const(name)
+        ns = sandbox.base_namespace
         source = get_caller
         privileges = sandbox.privileges[source]
         if privileges
-          constants = sandbox.base_namespace.constants
+          constants = ns.constants
           unless constants.include? name or constants.include? name.to_sym
             unless privileges.const_read_allowed? name.to_s
               raise SecurityError, "cannot access constant #{name}"
@@ -197,7 +198,7 @@ module Shikashi
           end
         end
 
-        const_value(sandbox.base_namespace.const_get(name))
+        const_value(ns.const_get(name))
       end
 
       def handle_cdecl(klass, const_id, value)
@@ -226,8 +227,6 @@ module Shikashi
       end
 
       def handle_method(klass, recv, method_name)
-        source = nil
-
         method_id = 0
 
         if method_name
@@ -241,7 +240,6 @@ module Shikashi
           end
           dest_source = m.body.file
 
-          privileges = nil
           if source != dest_source then
             privileges = sandbox.privileges[source]
 
@@ -262,23 +260,12 @@ module Shikashi
 
                 if dest_source then
                   loop_privileges = sandbox.privileges[loop_source]
-                else
-                  loop_privileges = nil
                 end
-
               end
             end
           end
-
-          return nil if method_name == :instance_eval
-          return nil if method_name == :binding
-
-          nil
-
         end
-
-
-      end # if
+      end
 
       def get_caller
         caller_locations[2].path
@@ -526,5 +513,3 @@ private
 end
 
 Shikashi.global_binding = binding()
-
-
