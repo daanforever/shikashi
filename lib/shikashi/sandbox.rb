@@ -85,13 +85,13 @@ module Shikashi
       "sandbox-#{rand(1000000)}"
     end
 
-    def initialize
+    def initialize(base_namespace=nil)
       @privileges = Hash.new
       @chain = Hash.new
       @hook_handler_list = Array.new
       @hook_handler = instantiate_evalhook_handler
       @hook_handler.sandbox = self
-      @base_namespace = create_adhoc_base_namespace
+      @base_namespace = create_adhoc_base_namespace(base_namespace)
       @hook_handler.base_namespace = @base_namespace
     end
 
@@ -443,8 +443,8 @@ private
       newhookhandler
     end
 
-    def create_adhoc_base_namespace
-      rnd_module_name = "Namespace_#{SecureRandom.hex(32)}"
+    def create_adhoc_base_namespace(base_namespace=nil)
+      rnd_module_name = base_namespace || "Namespace_#{SecureRandom.hex(32)}"
 
       eval("module Shikashi::Sandbox::#{rnd_module_name}; end")
       @base_namespace = eval("Shikashi::Sandbox::#{rnd_module_name}")
