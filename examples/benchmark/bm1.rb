@@ -12,7 +12,7 @@ code = "class X
 s = Shikashi::Sandbox.new
 
 Benchmark.bm(7) do |x|
-	
+
 x.report("normal") {
 	1000.times do
 	s.run(code, Shikashi::Privileges.allow_method(:new))
