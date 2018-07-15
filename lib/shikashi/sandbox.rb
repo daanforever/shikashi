@@ -85,13 +85,13 @@ module Shikashi
       "sandbox-#{rand(1000000)}"
     end
 
-    def initialize
+    def initialize(custom_namespace=nil)
       @privileges = Hash.new
       @chain = Hash.new
       @hook_handler_list = Array.new
       @hook_handler = instantiate_evalhook_handler
       @hook_handler.sandbox = self
-      @base_namespace = create_adhoc_base_namespace
+      @base_namespace = create_adhoc_base_namespace(custom_namespace)
       @hook_handler.base_namespace = @base_namespace
     end
 
@@ -433,8 +433,17 @@ module Shikashi
     end
 
     def destroy
-      Shikashi::Sandbox.send(:remove_const, @base_namespace.to_s.gsub(/^.*::/, '').to_sym)
+      module_path   = @base_namespace.name.split(/::/)
+      module_name   = module_path.pop
+      module_parent = if module_path.empty?
+                        Object
+                      else
+                        eval(module_path.join('::'))
+                      end
+
+      module_parent.send(:remove_const, module_name)
     end
+
 private
 
     def instantiate_evalhook_handler
@@ -443,12 +452,11 @@ private
       newhookhandler
     end
 
-    def create_adhoc_base_namespace
-      rnd_module_name = "Namespace_#{SecureRandom.hex(32)}"
+    def create_adhoc_base_namespace(custom_namespace=nil)
+      module_name = custom_namespace || "Shikashi::Sandbox::Namespace_#{SecureRandom.hex(32)}"
 
-      eval("module Shikashi::Sandbox::#{rnd_module_name}; end")
-      @base_namespace = eval("Shikashi::Sandbox::#{rnd_module_name}")
-      @base_namespace
+      eval("module #{module_name}; end")
+      @base_namespace = eval("#{module_name}")
     end
 
     def run_i(*args)
