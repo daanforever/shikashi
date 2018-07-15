@@ -24,6 +24,7 @@ require "shikashi/privileges"
 require "shikashi/pick_argument"
 require "getsource"
 require "timeout"
+require "securerandom"
 
 module Shikashi
 
@@ -433,6 +434,10 @@ module Shikashi
     def dispose
       @hook_handler_list.each(&:dispose)
     end
+
+    def destroy
+      Shikashi::Sandbox.send(:remove_const, @base_namespace.to_s.gsub(/^.*::/, '').to_sym)
+    end
 private
 
     def instantiate_evalhook_handler
@@ -442,7 +447,7 @@ private
     end
 
     def create_adhoc_base_namespace
-      rnd_module_name = "SandboxBasenamespace#{rand(100000000)}"
+      rnd_module_name = "Namespace_#{SecureRandom.hex(32)}"
 
       eval("module Shikashi::Sandbox::#{rnd_module_name}; end")
       @base_namespace = eval("Shikashi::Sandbox::#{rnd_module_name}")
